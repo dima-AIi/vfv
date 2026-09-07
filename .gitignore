@@ -1,0 +1,94 @@
+# Переменные окружения и секреты
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.pub
+id_dsa
+id_dsa.pub
+id_ecdsa
+id_ecdsa.pub
+id_ed25519
+id_ed25519.pub
+
+# Локальные файлы AI-инструментов
+.codex/
+.agents/
+.claude/
+.cursor/
+
+# IDE
+.vscode/
+.idea/
+.vs/
+*.code-workspace
+*.suo
+*.user
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.db
+*.sqlite3
+*.sqlite3-journal
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+*.egg-info/
+
+# Node.js
+node_modules/
+.pnpm-store/
+.vite/
+.turbo/
+.next/
+*.tsbuildinfo
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Результаты сборки и тестов
+dist/
+build/
+out/
+coverage/
+htmlcov/
+
+# Логи и временные файлы
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# Локальное файловое хранилище DevOS (Files module)
+storage/
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.stackdump
+
+# macOS
+.DS_Store

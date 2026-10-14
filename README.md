@@ -64,11 +64,32 @@ pnpm dev        # http://127.0.0.1:5173 (проксирует /api и /docs на
 | `ACCESS_TOKEN_EXPIRE_MINUTES` / `REFRESH_TOKEN_EXPIRE_DAYS` | срок токенов | 30 / 7 |
 | `STORAGE_DIR` | корень файлового хранилища (вне web-директории) | `<repo>/storage` |
 | `FILE_MAX_BYTES` | лимит размера загружаемого файла | 25000000 |
-| `AI_PROVIDER` | `mock` \| `anthropic` | `mock` |
+| `AI_PROVIDER` | `mock` \| `openai_compatible` | `mock` |
+| `AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL` | параметры OpenAI-совместимого эндпоинта | пусто |
+| `AI_TIMEOUT_SECONDS` | таймаут запроса к AI-провайдеру | 30 |
 | `ANTHROPIC_API_KEY` | ключ реального LLM (пусто → mock) | пусто |
 | `CORS_ORIGINS` | разрешённые origin | localhost:5173 |
 
 `.env` не попадает в Git (см. `.gitignore`). Реальные ключи хранить только локально.
+
+## AI-провайдер
+
+По умолчанию работает детерминированный `mock`-провайдер (без сетевых вызовов).
+Для реального LLM подойдёт любой OpenAI-совместимый chat-completions эндпоинт
+(Groq, NVIDIA build, Google Gemini openai-endpoint, OpenRouter, локальный Ollama).
+Переключение — только через окружение, ключей в репозитории нет:
+
+```bash
+AI_PROVIDER=openai_compatible
+AI_BASE_URL=https://api.groq.com/openai/v1   # пример; см. комментарии в .env.example
+AI_API_KEY=<локальный ключ>
+AI_MODEL=<имя модели>
+```
+
+Активный провайдер виден в `GET /api/v1/ai/providers`. Без `AI_BASE_URL` /
+`AI_API_KEY` / `AI_MODEL` действия вернут `400 AI_PROVIDER_NOT_CONFIGURED`;
+ошибки эндпоинта — `502 AI_PROVIDER_FAILED`, таймаут — `504 AI_PROVIDER_TIMEOUT`
+(ключ в сообщениях и логах не светится).
 
 ## Порты по умолчанию
 
@@ -141,12 +162,14 @@ scripts/
 
 - **Хранилище/БД:** SQLite и локальная ФС вместо PostgreSQL/Docker (ратификация
   владельца; переход — сменой `DATABASE_URL` / новым `FileStorage`).
-- **AI:** работает через mock-провайдер без внешних вызовов; реальный LLM
-  подключается через реестр провайдеров (`app/modules/ai/registry.py`) и
-  `AI_PROVIDER=anthropic` + `ANTHROPIC_API_KEY`.
+- **AI:** по умолчанию mock-провайдер без внешних вызовов; реальный LLM
+  подключается через реестр провайдеров (`app/modules/ai/registry.py`) —
+  `AI_PROVIDER=openai_compatible` + `AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL`.
 - **SECRET_KEY:** имеет dev-fallback для локального запуска; вне `local` обязан
-  задаваться явно (жёсткая проверка — backlog).
-- **События:** in-process диспетчер с дедупликацией по `eventId`; dead-letter
-  queue, персистентность событий и сквозной `correlationId` — backlog.
+  задаваться явно — при старте с dev-дефолтом в не-`local` окружении приложение
+  не поднимается (`RuntimeError`).
+- **События:** in-process диспетчер с дедупликацией по `eventId`; `correlationId`
+  событий подхватывает request-id HTTP-запроса; dead-letter queue и
+  персистентность событий — backlog.
 - **Уведомления:** только in-app; email/webhook-каналы — будущие этапы.
 - **Frontend-бандл:** единый чанк >500 kB (code-splitting — backlog).

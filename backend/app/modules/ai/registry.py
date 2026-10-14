@@ -1,10 +1,12 @@
 from app.core.config import settings
 from app.core.errors import AppError
 from app.modules.ai.mock_provider import MockAIProvider
+from app.modules.ai.openai_provider import OpenAICompatibleProvider
 from app.modules.ai.provider import AIProvider
 
 _PROVIDERS: dict[str, AIProvider] = {
     MockAIProvider.name: MockAIProvider(),
+    OpenAICompatibleProvider.name: OpenAICompatibleProvider(),
 }
 
 

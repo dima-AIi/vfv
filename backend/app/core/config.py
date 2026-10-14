@@ -36,6 +36,10 @@ class Settings(BaseSettings):
     database_url: str = f"sqlite+aiosqlite:///{REPO_ROOT / 'devos.db'}"
 
     ai_provider: str = "mock"
+    ai_base_url: str = ""
+    ai_api_key: str = ""
+    ai_model: str = ""
+    ai_timeout_seconds: float = 30.0
     anthropic_api_key: str = ""
 
     cors_origins: list[str] = [
